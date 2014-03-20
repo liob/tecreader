@@ -1,8 +1,14 @@
 #include <iostream>
 #include <string>
-//#include <vector>
 #include <boost/program_options.hpp>
 #include <boost/asio.hpp>
+
+#ifdef _WINDOWS
+#include <windows.h>
+#else
+#include <unistd.h>
+#define Sleep(x) usleep((x)*1000)
+#endif
 
 namespace po = boost::program_options;
 namespace asio = boost::asio;
@@ -60,14 +66,33 @@ int main(int argc, char *argv[]){
         }
     }
 
-    asio::serial_port serialPort(io, serialPortName);
+    asio::serial_port serialPort(io);
+    int i = 1;
+    while (i < 20)
+    {
+        try
+        {
+            serialPort.open(serialPortName);
+            break;
+        }
+        catch (exception& e)
+        {
+            if (i == 19)
+            {
+                cout << "Standard exception: " << e.what() << endl;
+                return 1;
+            }
+            Sleep(500);
+            i++;
+        }
+    }
+
     serialPort.set_option(asio::serial_port::baud_rate(baud_rate));
     asio::write(serialPort, asio::buffer(CMDstream.str()));
     asio::streambuf response;
     asio::read_until(serialPort, response, "\r\n");
     std::istream response_stream(&response);
     string responsestr;
-    //response_stream >> responsestr;
     getline(response_stream, responsestr);
     char unwanted_chars[] = "+ ";
     for (int i = 0; i < strlen(unwanted_chars); ++i)
@@ -78,4 +103,3 @@ int main(int argc, char *argv[]){
 
     return 0;
 }
-
