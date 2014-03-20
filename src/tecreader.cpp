@@ -67,7 +67,13 @@ int main(int argc, char *argv[]){
     asio::read_until(serialPort, response, "\r\n");
     std::istream response_stream(&response);
     string responsestr;
-    response_stream >> responsestr;
+    //response_stream >> responsestr;
+    getline(response_stream, responsestr);
+    char unwanted_chars[] = "+ ";
+    for (int i = 0; i < strlen(unwanted_chars); ++i)
+    {
+        responsestr.erase(remove(responsestr.begin(), responsestr.end(), unwanted_chars[i]), responsestr.end());
+    }
     cout << responsestr;
 
     return 0;
