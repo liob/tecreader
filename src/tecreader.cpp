@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, char *argv[]){
     string serialPortName;
-    const unsigned int& baud_rate  = 9600;
+    const unsigned int& baud_rate = 9600;
     stringstream infoText;
     asio::io_service io;
     po::options_description desc("Options");
@@ -59,15 +59,16 @@ int main(int argc, char *argv[]){
         CMDstream << CMD[i] << std::endl;
         }
     }
-    //cout << CMDstream.str();
 
     asio::serial_port serialPort(io, serialPortName);
     serialPort.set_option(asio::serial_port::baud_rate(baud_rate));
     asio::write(serialPort, asio::buffer(CMDstream.str()));
     asio::streambuf response;
-    asio::read_until(serialPort, response, "\n");
+    asio::read_until(serialPort, response, "\r\n");
     std::istream response_stream(&response);
-    cout << response_stream;
+    string responsestr;
+    response_stream >> responsestr;
+    cout << responsestr;
 
     return 0;
 }
