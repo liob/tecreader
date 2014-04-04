@@ -20,7 +20,7 @@ Compilation:
 ### Install Dependencies:
 The following dependencies are required in order to build TecReader on linux as well as to cross compile a statically linked binary for windows:
 
-    mingw32-gcc-c++ mingw32-boost boost boost-devel libstdc++-static mingw32-boost-static
+    mingw32-gcc-c++ libstdc++-static boost boost-devel mingw32-boost mingw32-boost-static
 
 
 License:
