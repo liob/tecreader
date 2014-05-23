@@ -16,8 +16,15 @@ using namespace std;
 
 
 int main(int argc, char *argv[]){
+
+    // serial port settings
     string serialPortName;
-    const unsigned int& baud_rate = 9600;
+    int baud_rate = 9600;
+    int character_size = 8;
+    asio::serial_port_base::parity::type parity = asio::serial_port_base::parity::none;
+    asio::serial_port_base::flow_control::type flow_control = asio::serial_port_base::flow_control::none;
+    asio::serial_port_base::stop_bits::type stop_bits = asio::serial_port_base::stop_bits::one;
+
     stringstream infoText;
     asio::io_service io;
     po::options_description desc("Options");
@@ -25,7 +32,6 @@ int main(int argc, char *argv[]){
       ("help,h", "Print help messages")
       ("port,p", po::value<string>()->required(), "specify comport - i.e.: COM1 | /dev/ttyS0");
     po::variables_map vm;
-    //po::store(po::parse_command_line(argc, argv, desc), vm);
     po::parsed_options parsed =
         po::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
     po::store(parsed, vm);
@@ -87,7 +93,13 @@ int main(int argc, char *argv[]){
         }
     }
 
+    // set serial port options
     serialPort.set_option(asio::serial_port::baud_rate(baud_rate));
+    serialPort.set_option(asio::serial_port_base::character_size(character_size));
+    serialPort.set_option(asio::serial_port_base::parity(parity));
+    serialPort.set_option(asio::serial_port_base::flow_control(flow_control));
+    serialPort.set_option(asio::serial_port_base::stop_bits(stop_bits));
+
     asio::write(serialPort, asio::buffer(CMDstream.str()));
     asio::streambuf response;
     asio::read_until(serialPort, response, "\r\n");
